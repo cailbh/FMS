@@ -42,11 +42,6 @@
 .el-table .choose-row {
   background: #f0f9eb;
 }
-.tagEditDiv{
-  width: 100%;
-  height: 100%;
-  background: blue;
-}
 .returnHomeBut{
   float: right;
   margin: 7px;

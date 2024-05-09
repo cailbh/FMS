@@ -14,11 +14,21 @@ const tagsSchema = mongoose.Schema({
     isChoose:Boolean,//是否选中
     fields:Array,//领域标签
     subF:Array,//具体的标签已经标签父子关系
+    tree:Object,//具体的标签已经标签父子关系
+});
+const subSchema = mongoose.Schema({
+    id:String,
+    cTagId:String,
+    tag:String,
+    subTag:String,
+    subTagName:String
 });
 const filesSchema = mongoose.Schema({
     name:String,//标题
     content:String,//内容
     fileName:String,//文件名
+    id:String,
+    tags:Array
 });
 const caseRelSchema = mongoose.Schema({
 });
@@ -26,7 +36,7 @@ const caseRelSchema = mongoose.Schema({
 /************** 定义模型Model **************/
 const Models = {
     Tag: mongoose.model('Tags', tagsSchema,'tags'),
-    File: mongoose.model('files', tagsSchema,'Files'),
+    File: mongoose.model('files', filesSchema,'testFiles'),
 }
 
 module.exports = Models;

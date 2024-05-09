@@ -5,10 +5,11 @@
   <div class="FileManagerPanel">
     <div class="panelHead">FileManager
       <el-button class="returnHomeBut" v-show="preShow" size="mini" @click="returnHome()">返回</el-button>
+      <el-button class="returnHomeBut" v-show="preShow" size="mini" @click="preClick()">打标</el-button>
     </div>
     <div id="FileManagerPanelDiv" class="panelBody" ref="FileManagerPanelDiv">
       <el-table v-show="tableShow" :data="tableData" style="width: 100%" :row-class-name="tableRowClassName">
-        <el-table-column label="序号" width="180">
+        <el-table-column label="序号" width="70">
           <template slot-scope="scope">
             <i class="el-icon-document"></i>
             <span style="margin-left: 10px">{{ scope.row.sort }}</span>
@@ -25,7 +26,7 @@
             <!-- </el-popover> -->
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="300">
+        <el-table-column label="操作" fixed="right" width="200">
           <template slot-scope="scope">
             <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">查看</el-button>
             <el-button size="mini" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -34,7 +35,9 @@
       </el-table>
       <div v-show="preShow" class="preDiv">
           <div class="tagWrap">
-            <div ></div>
+            <!-- <div > -->
+              <TagControl state="file" :curTag="currentTagData"></TagControl>
+              <!-- </div> -->
           </div>
           <div class="docWrap">
             <div ref="file"></div>
@@ -55,6 +58,8 @@ import * as d3 from 'd3'
 import { onMounted, ref } from 'vue';
 import domtoimage from 'dom-to-image';
 import tools from "@/utils/tools.js";
+
+import TagControl from'@/components/TagControl/index.vue'
 import { color } from 'd3';
 import { _ } from 'core-js';
 // let docx = require("docx-preview");
@@ -62,6 +67,7 @@ const docx = require("docx-preview");
 import axios from "axios";
 export default {
   props: ["videoTime"],
+  components:{TagControl},
   data() {
     return {
       colorMap: {},
@@ -87,7 +93,8 @@ export default {
       chooseTagsId:'',
       fileData: [],
       tableData: [],
-      currentTagData:''
+      currentTagData:'',
+      currentFile:''
     };
   },
   watch: {
@@ -101,12 +108,10 @@ export default {
       let tableData = []
       val.forEach((element,index)=> {
         let temp = {
+          id:element['_id'],
           sort: index+1,
-          name: element['name'],
+          name: element['title'],
           fileName: element['fileName'],
-        }
-        if(element['isChoose']){
-          _this.chooseTagsId = element['id']
         }
         tableData.push(temp)
       });
@@ -117,8 +122,10 @@ export default {
     click_Ent(time) {
       this.$emit("timeDur", time);
     },
+    preClick(){
+      this.autoMarking(this.currentFile['id'])
+    },
     goPreview(fileName) {
-      console.log(11,fileName);
       axios({
         method: "get",
         responseType: "blob", // 因为是流文件，所以要指定blob类型
@@ -135,10 +142,10 @@ export default {
       this.tableShow = true;
       this.preShow = false;
     },
-    ModifyChooseTag(cId){
+    autoMarking(cId){
       const _this = this;
       this.$http
-        .post("/api/tag/modifyChooseState", {
+        .post("/api/tag/AutoMarking", {
           params: {
             cId: cId
           }
@@ -149,7 +156,11 @@ export default {
             type: 'success',
             duration: 1000
           });
-          _this.getTagData();
+          console.log("atm",response)
+          let LLMTag = JSON.parse(response.bodyText);
+          if(typeof(LLMTag) === 'object'){
+            _this.$bus.$emit("LLMPreTags", LLMTag);
+          }
         });
     },
     handleChoose(index, row) {
@@ -157,11 +168,13 @@ export default {
       this.ModifyChooseTag(cId);
     },
     handleEdit(index, row) {
-      console.log(index, row);
       this.tableShow = false;
       this.preShow = true;
-      console.log(row)
+      this.currentFile =this.fileData.find((d)=>{return d['_id'] == row['id']});
+      console.log(row,this.fileData)
       this.goPreview(row.fileName)
+      console.log(1,this.currentFile)
+      this.$bus.$emit("currentFile", this.currentFile);
     },
     handleDelete(index, row) {
       console.log(index, row);

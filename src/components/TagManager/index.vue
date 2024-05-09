@@ -35,7 +35,7 @@
         </el-table-column>
       </el-table>
       <div v-show="editShow" class="tagEditDiv">
-
+        <TagControl state="edit" :curTag="currentTagData"></TagControl>
       </div>
       <div class="chartTooltip">
         <p>
@@ -54,8 +54,9 @@ import domtoimage from 'dom-to-image';
 import tools from "@/utils/tools.js";
 import { color } from 'd3';
 import { _ } from 'core-js';
-
+import TagControl from'@/components/TagControl/index.vue'
 export default {
+  components:{TagControl},
   props: ["videoTime"],
   data() {
     return {
@@ -144,6 +145,7 @@ export default {
     handleEdit(index, row) {
       this.tableShow = false;
       this.editShow = true;
+      this.$bus.$emit("tagEdit","true");
     },
     handleDelete(index, row) {
     },
