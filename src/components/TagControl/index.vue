@@ -154,6 +154,8 @@ export default {
     currentTagDataTree(val){
       let fileds = [];
       let subF = [];
+      let newData = this.traverseTree(-1,-1,val);
+      console.log(val,newData)
       val['children'].forEach((fd,idx)=>{
         fileds.push(fd['name']);
         fd['id'] = `${idx+1}`
@@ -208,6 +210,32 @@ export default {
     },
   },
   methods: {
+    
+    traverseTree(idx,preId,data) {//遍历树修正id
+      data = tools.deepClone(data);
+      let pId = data.id;
+        console.log(11133331,typeof(pId),pId,typeof(pId)=="undefined")
+      if(typeof(pId)=="undefined"){
+        console.log(1111,pId)
+        pId = -1;
+      }
+      if (idx != -1) {
+        data.id = `${preId}_${idx}`;
+      }
+      if(preId==-1){
+        data.id = `${idx}`;
+      }
+      pId = data.id;
+      console.log(idx,preId,pId,data.id);
+      if (!data) return;
+      let children = data['children'];
+      let reC = []
+      for (let i = 0; i < children.length; i++) {
+        reC.push(this.traverseTree(i, pId, children[i]));
+      }
+      data['children'] = reC;
+      return data;
+    },
     click_Ent(time) {
       this.$emit("timeDur", time);
     },
