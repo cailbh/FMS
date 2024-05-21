@@ -175,6 +175,8 @@ export default {
       this.goPreview(row.fileName)
       console.log(1,this.currentFile)
       this.$bus.$emit("currentFile", this.currentFile);
+      
+      this.$bus.$emit("tagEdit","true");
     },
     handleDelete(index, row) {
       console.log(index, row);

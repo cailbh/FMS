@@ -31,10 +31,10 @@ def LLMPRE(text_name, text_content, filed, tags):
     )
     print(filed, tags)
     outExamples = {
-        "" + str(filed[0]): [{"tagName": "", "relativity": 0.1, "children": []},
-                             {"tagName": "", "relativity": 0.8, "children": []}],
-        "" + str(filed[1]): [{"tagName": "", "relativity": 0.1, "children": []},
-                             {"tagName": "", "relativity": 0.8, "children": []}],
+        "" + str(filed[0]): [{"name": "", "relativity": 0.1, "children": []},
+                             {"name": "", "relativity": 0.8, "children": []}],
+        "" + str(filed[1]): [{"name": "", "relativity": 0.1, "children": []},
+                             {"name": "", "relativity": 0.8, "children": []}],
     }
     _input = prompt_template.format(outExample=outExamples, filed=filed, tags=tags, text_name=text_name,
                                     text_content=text_content)
@@ -89,19 +89,19 @@ if __name__ == '__main__':
     res = {
   "技术问题": [
     {
-      "tagName": "图像视频文本识别难度",
+      "name": "图像视频文本识别难度",
       "relativity": 0.9,
       "children": [
         {
-          "tagName": "场景复杂性",
+          "name": "场景复杂性",
           "relativity": 0.8
         },
         {
-          "tagName": "文本形式多样性",
+          "name": "文本形式多样性",
           "relativity": 0.8
         },
         {
-          "tagName": "语义隐藏性",
+          "name": "语义隐藏性",
           "relativity": 0.7
         }
       ]
@@ -109,51 +109,51 @@ if __name__ == '__main__':
   ],
   "技术方案": [
     {
-      "tagName": "多语言文本检测与识别",
+      "name": "多语言文本检测与识别",
       "relativity": 0.9,
       "children": [
         {
-          "tagName": "跨语种文本特征表示",
+          "name": "跨语种文本特征表示",
           "relativity": 0.85
         },
         {
-          "tagName": "特征迁移方法",
+          "name": "特征迁移方法",
           "relativity": 0.8
         },
         {
-          "tagName": "生成式结构学习",
+          "name": "生成式结构学习",
           "relativity": 0.7
         },
         {
-          "tagName": "区分式统计学习",
+          "name": "区分式统计学习",
           "relativity": 0.7
         }
       ]
     },
     {
-      "tagName": "多模态协同感知",
+      "name": "多模态协同感知",
       "relativity": 0.85,
       "children": [
         {
-          "tagName": "图像视频内容融合分析",
+          "name": "图像视频内容融合分析",
           "relativity": 0.8
         }
       ]
     },
     {
-      "tagName": "网络空间内容安全",
+      "name": "网络空间内容安全",
       "relativity": 0.8,
       "children": [
         {
-          "tagName": "敏感内容鉴别与过滤",
+          "name": "敏感内容鉴别与过滤",
           "relativity": 0.9
         },
         {
-          "tagName": "多语言文本图像视频数据库",
+          "name": "多语言文本图像视频数据库",
           "relativity": 0.7
         },
         {
-          "tagName": "应用示范原型系统",
+          "name": "应用示范原型系统",
           "relativity": 0.6
         }
       ]
