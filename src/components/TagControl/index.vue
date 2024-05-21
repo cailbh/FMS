@@ -60,8 +60,10 @@ export default {
       currentTagDataTree:[],
       currentTagDataTree:[],
       currentTagDataTreeRedata:[],
+      currentTagDataTreeReSign:1,
       LLMPreDataTree:[],
       LLMPreDataTreeReData:[],
+      LLMPreDataTreeReSign:1,
       currentTagDataTree_Redata:[],
       currentFile: '',
       currentFileTag: [],
@@ -97,7 +99,6 @@ export default {
       let data = this.currentTagDataTree; 
       let svg = this.treeSvg;
       this.updatTree(svg,groups, data,"Ori");
-      // this.drawtagTree();
     },
     currentFileLLMTag(val) {
       this.currentFileTag = [...new Set([...this.currentFileTag, ...val])]
@@ -118,34 +119,40 @@ export default {
         }
         data['children'].push(temp);
       }
-      // val.keys().forEach((v)=>{
-      // })
       let newData = this.traverseTree(-1,-1,data,'uuid');
       this.LLMPreDataTree = newData;
     },
     LLMPreDataTreeReData(val){
+    },
+    LLMPreDataTree(val){
+      let newData = this.traverseTree(-1,-1,val);
+      if(this.LLMPreDataTreeReSign == 1){
+        this.LLMPreDataTree = newData;
+        this.LLMPreDataTreeReSign = 0;
+      }
+      else{
+        this.LLMPreDataTreeReSign = 1;
+      }
       let groups = this.treeNewGroups;
       let svg = this.treeNewSvg;
       this.updatTree(svg,groups, val,"New");
     },
-    LLMPreDataTree(val){
-      let newData = this.traverseTree(-1,-1,val);
-      this.LLMPreDataTreeReData = newData;
-    },
-    currentTagDataTreeRedata(val){
 
-      let groups = this.treeGroups;
-      let svg = this.treeSvg;
-      // let data = this.currentTagDataTree;
-      this.updatTree(svg,groups, val,"Ori");
-    },
     currentTagDataTree(val){
       let fileds = [];
       let subF = [];
       let newData = this.traverseTree(-1,-1,val);
-      
-      this.currentTagDataTreeRedata= newData;
-      
+      if(this.currentTagDataTreeReSign == 1){
+        this.currentTagDataTree = newData;
+        this.currentTagDataTreeReSign = 0;
+      }
+      else{
+        this.currentTagDataTreeReSign = 1;
+      }
+      let groups = this.treeGroups;
+      let svg = this.treeSvg;
+      this.updatTree(svg,groups, val,"Ori");
+
       val['children'].forEach((fd,idx)=>{
         fileds.push(fd['name']);
       })
@@ -153,8 +160,6 @@ export default {
         fields:fileds,
         subF:subF
       }
-      
-      // this.drawtagTree();
     },
     currentTagData(val) {
       this.currentTagDataTree = tools.deepClone(val['tree']);
@@ -183,6 +188,7 @@ export default {
   methods: {
     
     traverseTree(idx,preId,data,sign='none') {//遍历树修正id
+      console.log(11111111,data)
       data = tools.deepClone(data);
       if(sign=="uuid"){
         data.uuid = uuidv4();
@@ -209,6 +215,7 @@ export default {
         reC.push(this.traverseTree(i, pId, children[i],sign));
       }
       data['children'] = reC;
+      console.log(22222222,data)
       return data;
     },
     click_Ent(time) {
