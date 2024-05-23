@@ -103,16 +103,12 @@ export default {
     currentFileLLMTag(val) {
       this.currentFileTag = [...new Set([...this.currentFileTag, ...val])]
     },
-
-
     LLMPreTags(val) {
       let data = {
         "name":"root",
         "children":[]
       }
       for(let k in val){
-        
-        console.log(k)
         let temp = {
           "name":k,
           "children":val[k]
@@ -188,7 +184,6 @@ export default {
   methods: {
     
     traverseTree(idx,preId,data,sign='none') {//遍历树修正id
-      console.log(11111111,data)
       data = tools.deepClone(data);
       if(sign=="uuid"){
         data.uuid = uuidv4();
@@ -209,13 +204,11 @@ export default {
       if(typeof(children)=="undefined") {
         data['children'] = [];
         return data};
-      // console.log(111,data,children,)
       let reC = []
       for (let i = 0; i < children.length; i++) {
         reC.push(this.traverseTree(i, pId, children[i],sign));
       }
       data['children'] = reC;
-      console.log(22222222,data)
       return data;
     },
     click_Ent(time) {
@@ -227,7 +220,6 @@ export default {
     },
     confirm(){
       const _this = this;
-      console.log([_this.currentTagData,_this.currentTagDataTree_Redata,_this.currentTagDataTree])
       this.$http
         .post("/api/file/saveTag", {
           params: {
@@ -316,7 +308,6 @@ export default {
     },
     findTreeNode(tId,Sign){
       const _this = this;
-      console.log("sadas",tId,Sign)
       let idLay = tId.split("_");
       let lay = idLay.length;
       
@@ -328,7 +319,6 @@ export default {
       let cId = idLay[0];
       while (cLay < lay){
         rTag = rTag['children'].find((t) => { return t['id'] == cId; });
-        console.log(rTag,cId,tId,currentData);
         cLay++;
         if(cLay < lay)
           cId =`${cId}_${idLay[cLay]}`;
@@ -372,12 +362,10 @@ export default {
       if( Sign =="New"){currentData = tools.deepClone(_this.LLMPreDataTree)}
 
       let rTag = currentData;
-      console.log("New",Sign,rTag)
       let cLay = 0;
       let cId = idLay[0];
       while (cLay < lay){
         rTag = rTag['children'].find((t) => { return t['id'] == cId; });
-        console.log(rTag,cId,tId);
         cLay++;
         if(cLay < lay)
           cId =`${cId}_${idLay[cLay]}`;
@@ -452,9 +440,8 @@ export default {
             groupsN.attr('transform', event.transform);
         });
 
-      svg.call(graphZoom)
-      svgN.call(graphNZoom)
-
+      svg.call(graphZoom);
+      svgN.call(graphNZoom);
 
         // this.gNode = gNode;
         // this.gLink = gLink;
@@ -597,7 +584,36 @@ export default {
               d3.select(`#tagMergeBut${Sign}_${d.data.id}`)
               .attr("opacity", 1)
             // }
+          })        
+          
+          nodeEnter.append("rect")//相关度
+          .attr("id", d => `tagRel${Sign}_${d.data.id}`)
+          .attr("class",`tag`)
+          .attr("y", '-14')
+          .attr("x", '-4')
+          .attr("height", 40)
+          .attr("rx", 2)
+          .attr("width", d => {
+            let textW = document.getElementById(`tagText${Sign}_${d.data.name}`).getBBox().width+8;
+            textW = textW>50?textW:50;
+            let relativity = d.data.relativity
+            if(typeof(relativity)=="undefined"){relativity = 0}
+
+            var scale = d3.scaleLinear([0, 1], [0,textW]);
+            // d.y += ;
+            return scale(relativity);
           })
+          .attr("stroke", "black")
+          .attr("fill",d=>{
+            return 'red'
+          })
+          .on("mousedown", function (e,d) {
+            _this.stopZoom(svg);
+              _this.initZoom(groups,svg);
+            document.getElementById(`tagRel${Sign}_${d.data.id}`).addEventListener('mouseup', function (event) {
+              console.log(1232131)
+            })
+            })      
 
         nodeEnter.append("rect")//合并
           .attr("id", d => `tagMergeBut${Sign}_${d.data.id}`)
@@ -614,7 +630,6 @@ export default {
           .attr("fill","yellow")
           .on("mousedown", function (e,d) {
             let cId = d.data.id;
-            console.log(_this.mergeSourceNodeId,_this.mergeTagrgetNodeId,cId);
             if(_this.mergeSourceNodeId == ""){
               _this.mergeSourceNodeId = [cId,Sign];
             }
@@ -787,7 +802,6 @@ export default {
         link.merge(linkEnter).transition(transition)
         .attr("d", d => {
           // document.getElementById(`tagRect${Sign}_${d.data.name}`).getBBox().width+8
-          // console.log("sou",d.sou)
             const o = { x: d.source.x, y: d.source.y+100 };
             const p = { x: d.target.x, y: d.target.y }
             return diagonal({ source: o, target: p });
@@ -809,7 +823,38 @@ export default {
 
       }
       update(root);
-    }
+    },
+    stopZoom(bodyDom) {
+      bodyDom.call(d3.zoom().on("zoom",null));
+
+      },
+      initZoom(groups,svg){
+        const _this = this;
+        let stx = 0;
+      let sty = 0;
+      let stk = 1;
+      var graphZoom = d3.zoom()
+        .scaleExtent([0, 10])
+        .on("start", (e) => {
+          sty = e.transform.y;
+          stx = e.transform.x;
+          stk = e.transform.k;
+        })
+        .on('zoom', (e) => {
+          treeGTransformX = _this.treeGTransformX + e.transform.x - stx;
+          treeGTransformY = _this.treeGTransformY + e.transform.y - sty;
+          treeGTransformK = _this.treeGTransformK + e.transform.k - stk;
+          groups.attr('transform', 'translate(' + (treeGTransformX) + ',' + (treeGTransformY) + ') scale(' + (treeGTransformK) + ')')
+        })
+        .on('end', (e) => {
+          _this.treeGTransformX = treeGTransformX;
+          _this.treeGTransformY = treeGTransformY;
+          _this.treeGTransformK = treeGTransformK;
+          groups.attr('transform', 'translate(' + (treeGTransformX) + ',' + (treeGTransformY) + ') scale(' + (treeGTransformK) + ')')
+        });
+console.log("zoomInit")
+      svg.call(graphZoom);
+      }
   },
   created() {
     const _this = this;

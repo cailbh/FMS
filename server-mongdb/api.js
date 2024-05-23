@@ -15,7 +15,7 @@ var binaryEncoding = 'binary';
 router.get('/api/file/getDoc', (req, res) => {
     let fileName = req.query.fileName;
     // 假设我们的word文档文件就存放在这个doc目录里面
-    let docxUrl = `D:/Cailibuhong/XGD/fileData/${fileName}.docx`
+    let docxUrl = `D:/Work/YanCao/jg/fileData/${fileName}.docx`
   
     // 允许跨域
     res.header("Access-Control-Allow-Origin", "*");
@@ -39,7 +39,7 @@ router.post('/api/tag/AutoMarking', (req, res) => {
     let indexStr =` ${fileId} 2`;
     console.log(`python ../public/py/AutoMarking.py ${indexStr}`)
     process.env.LANG ='zh_CN.GBK';
-    var workerProcess = child_process.exec(`conda activate llm &&  python ../public/py/AutoMarking.py ${indexStr}`,{ encoding: 'buffer' }, function (error, stdout, stderr) {
+    var workerProcess = child_process.exec(`conda activate LLM &&  python ../public/py/AutoMarking.py ${indexStr}`,{ encoding: 'buffer' }, function (error, stdout, stderr) {
         if (error) {
             console.log(error.stack);
             console.log('Error code: '+error.code);

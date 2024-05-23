@@ -63,7 +63,7 @@ import TagControl from'@/components/TagControl/index.vue'
 import { color } from 'd3';
 import { _ } from 'core-js';
 // let docx = require("docx-preview");
-const docx = require("docx-preview");
+//const docx = require("docx-preview");
 import axios from "axios";
 export default {
   props: ["videoTime"],
